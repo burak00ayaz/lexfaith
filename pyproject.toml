@@ -1,0 +1,54 @@
+[project]
+name = "lexfaith"
+version = "0.1.0"
+description = "Entity-substitution benchmark for lexical faithfulness of soft context compression in RAG"
+readme = "README.md"
+authors = [
+    { name = "ibrahim", email = "ibrahim.yurt@tum.de" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "datasets",
+    "en-core-web-md",
+    "en-core-web-trf",
+    "torch>=2.6,<2.10",
+    "openai",
+    "pandas",
+    "rapidfuzz",
+    "requests",
+    "numpy",
+    "spacy>=3.8,<3.9",
+    "tqdm",
+    # PISCO's remote code (naver/pisco-mistral) was written for transformers 4.48
+    "transformers>=4.48,<4.49",
+    "wordfreq",
+]
+
+[dependency-groups]
+readers = [
+    "accelerate>=1.2,<2",
+    "peft>=0.14,<0.15",
+    "bitsandbytes>=0.45; sys_platform == 'linux'",
+]
+
+[project.scripts]
+lexfaith-build = "lexfaith.build:main"
+lexfaith-eval = "lexfaith.evaluate:main"
+lexfaith-audit = "lexfaith.audit:main"
+lexfaith-read = "lexfaith.readers:main"
+lexfaith-build-ids = "lexfaith.idbuild:main"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+en-core-web-trf = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl" }
+# CUDA 12.6 wheels still include Volta (sm70) kernels for the V100; macOS uses PyPI.
+torch = [{ index = "pytorch-cu126", marker = "sys_platform == 'linux'" }]
+en-core-web-md = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl" }
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
